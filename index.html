@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Mobile OS - HD Malahayati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;
+  --fg:#ffffff;
+  --muted:rgba(255,255,255,0.55);
+  --card-bg:rgba(28,28,30,0.72);
+  --card-border:rgba(255,255,255,0.08);
+  --accent:#0A84FF;
+  --orange:#FF9F0A;
+  --red:#FF453A;
+  --green:#30D158;
+  --purple:#BF5AF2;
+  --pink:#FF375F;
+  --teal:#40C8E0;
+  --yellow:#FFD60A;
+  --indigo:#5E5CE6;
+  --sky-main:#03A9F4;
+  --sky-dark:#0288D1;
+  --sky-deep:#01579B;
+  --leaf-main:#FFB74D;
+  --leaf-dark:#FF8F00;
+  --easing:cubic-bezier(0.32,0.72,0,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--fg);user-select:none;-webkit-user-select:none;touch-action:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea{font-family:inherit}
+
+/* ===== PHONE FRAME ===== */
+#frame-wrapper{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 50%, #1a1a2e 0%, #050505 100%);
+}
+#phone{
+  position:relative;width:390px;height:844px;background:#000;border-radius:55px;
+  box-shadow:0 0 0 12px #0a0a0a,0 0 0 14px #1c1c1e,0 50px 100px rgba(0,0,0,0.5),0 0 80px rgba(10,132,255,0.15);
+  overflow:hidden;transform:scale(1);transition:transform 0.3s var(--easing);
+}
+@media (max-height:900px){#phone{transform:scale(0.92)}}
+@media (max-width:420px){#phone{transform:scale(0.85)}}
+
+/* Dynamic Island */
+#dynamic-island{
+  position:absolute;top:11px;left:50%;transform:translateX(-50%);
+  width:126px;height:37px;background:#000;border-radius:20px;z-index:5000;
+  display:flex;align-items:center;justify-content:center;
+  transition:width 0.4s var(--easing),height 0.4s var(--easing),border-radius 0.4s var(--easing);
+}
+#dynamic-island.expanded{width:280px;height:38px;border-radius:20px}
+#dynamic-island-content{display:flex;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.3s 0.2s;padding:0 16px;width:100%}
+#dynamic-island.expanded #dynamic-island-content{opacity:1}
+#island-album-art{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--purple),var(--pink));flex-shrink:0}
+#island-track-info{flex:1;min-width:0}
+#island-track-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+#island-artist-name{font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#island-wave{display:flex;gap:2px;align-items:flex-end;height:14px}
+.island-bar{width:2.5px;background:var(--accent);border-radius:1px;animation:barWave 1s ease-in-out infinite}
+.island-bar:nth-child(1){height:50%;animation-delay:0s}
+.island-bar:nth-child(2){height:100%;animation-delay:0.2s}
+.island-bar:nth-child(3){height:60%;animation-delay:0.4s}
+@keyframes barWave{0%,100%{transform:scaleY(0.3)}50%{transform:scaleY(1)}}
+
+/* ===== WALLPAPER ===== */
+#wallpaper{
+  position:absolute;inset:0;z-index:0;
+  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 25%,#6d28d9 50%,#be185d 75%,#f59e0b 100%);
+  background-size:200% 200%;
+  transition:background-position 0.5s var(--easing);
+}
+#wallpaper::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 30%, rgba(168,85,247,0.4) 0%, transparent 40%),
+             radial-gradient(circle at 80% 70%, rgba(236,72,153,0.3) 0%, transparent 40%),
+             radial-gradient(circle at 50% 50%, rgba(59,130,246,0.2) 0%, transparent 50%);
+}
+
+/* ===== STATUS BAR ===== */
+#status-bar{
+  position:absolute;top:0;left:0;right:0;height:54px;z-index:4000;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 32px 0 32px;font-size:15px;font-weight:600;
+  padding-top:14px;
+}
+.status-time{font-variant-numeric:tabular-nums;letter-spacing:-0.3px}
+.status-icons{display:flex;align-items:center;gap:6px}
+#signal-bars{display:flex;align-items:flex-end;gap:2px;height:11px}
+.bar{width:3px;background:#fff;border-radius:1px}
+.bar:nth-child(1){height:4px}
+.bar:nth-child(2){height:6px}
+.bar:nth-child(3){height:8px}
+.bar:nth-child(4){height:10px}
+
+/* ===== HOME SCREEN ===== */
+#home-screen{position:absolute;inset:0;z-index:10}
+#pages-container{
+  position:absolute;inset:0;
+  display:flex;width:300%;height:100%;
+  transition:transform 0.5s var(--easing);will-change:transform;
+}
+.page{
+  width:33.333%;height:100%;flex-shrink:0;
+  padding:60px 16px 120px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.page-content{width:100%;max-width:340px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+/* Widgets */
+.widget{
+  background:var(--card-bg);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border:1px solid var(--card-border);
+  border-radius:24px;padding:18px;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  transition:transform 0.3s var(--easing);
+}
+.widget.pulse{animation:widgetPulse 0.6s ease-out}
+@keyframes widgetPulse{
+  0%{box-shadow:0 0 0 0 rgba(10,132,255,0.5),0 4px 20px rgba(0,0,0,0.2)}
+  50%{box-shadow:0 0 0 12px rgba(10,132,255,0),0 4px 20px rgba(0,0,0,0.2)}
+  100%{box-shadow:0 0 0 0 rgba(10,132,255,0),0 4px 20px rgba(0,0,0,0.2)}
+}
+
+/* Clock Widget */
+.clock-widget{display:flex;flex-direction:column;align-items:flex-start;padding:20px 22px}
+.clock-widget .city{font-size:20px;font-weight:600;letter-spacing:-0.3px}
+.clock-widget .time{font-size:54px;font-weight:300;letter-spacing:-2px;margin-top:-2px;font-variant-numeric:tabular-nums}
+.clock-widget .weather-line{font-size:13px;color:rgba(255,255,255,0.8);margin-top:2px;display:flex;align-items:center;gap:6px}
+
+/* Weather Widget */
+.weather-widget{background:linear-gradient(135deg,#4A90E2 0%,#357ABD 50%,#2C5F8A 100%);border-color:rgba(255,255,255,0.15)}
+.weather-loc{font-size:16px;font-weight:600}
+.weather-temp{font-size:48px;font-weight:300;line-height:1;margin-top:2px}
+.weather-cond{font-size:13px;opacity:0.9;margin-top:2px}
+.weather-range{font-size:13px;opacity:0.85;margin-top:4px}
+.weather-range .low{color:rgba(255,200,200,0.9)}
+
+/* Patient Search Widget */
+.patient-search-widget{padding:16px}
+.psw-header{font-size:11px;font-weight:700;color:var(--sky-main);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.psw-body{display:flex;align-items:center;gap:8px}
+.psw-search-input{
+  flex:1;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;padding:8px 12px;color:#fff;font-size:13px;outline:none;
+}
+.psw-search-input::placeholder{color:rgba(255,255,255,0.4)}
+.psw-results{max-height:180px;overflow-y:auto;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.psw-result-item{
+  background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;
+  display:flex;justify-content:space-between;align-items:center;font-size:12px;
+  cursor:pointer;transition:background 0.2s;
+}
+.psw-result-item:hover{background:rgba(255,255,255,0.12)}
+.psw-result-name{font-weight:600}
+.psw-result-meta{color:rgba(255,255,255,0.6);font-size:10px}
+.psw-empty{text-align:center;color:rgba(255,255,255,0.4);font-size:11px;padding:10px}
+
+/* Screen Time Widget */
+.screentime-widget{padding:14px 18px}
+.screentime-title{font-size:11px;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.screentime-val{font-size:28px;font-weight:700}
+.screentime-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px}
+
+/* ===== APP ICONS GRID ===== */
+.apps-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:24px 8px;
+  padding:0 4px;
+}
+.app-icon{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;position:relative;
+  transition:transform 0.15s ease;
+}
+.app-icon:active{transform:scale(0.92)}
+.app-icon .icon-bg{
+  width:60px;height:60px;border-radius:22%;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.app-icon .icon-bg svg{width:36px;height:36px;color:#fff;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.15))}
+.app-icon .icon-label{font-size:11px;font-weight:400;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);text-align:center;max-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-icon .delete-badge{
+  position:absolute;top:-2px;right:6px;width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,0.6);border:2px solid #fff;color:#fff;font-size:10px;
+  display:none;align-items:center;justify-content:center;z-index:2;
+}
+body.wiggle-mode .delete-badge{display:flex}
+
+/* Wiggle Animation */
+@keyframes wiggle{
+  0%{transform:rotate(0deg)}
+  25%{transform:rotate(1.4deg)}
+  75%{transform:rotate(-1.4deg)}
+  100%{transform:rotate(0deg)}
+}
+body.wiggle-mode .app-icon .icon-bg{
+  animation:wiggle 0.35s ease-in-out infinite;
+}
+body.wiggle-mode .app-icon:nth-child(2) .icon-bg{animation-delay:0.05s}
+body.wiggle-mode .app-icon:nth-child(3) .icon-bg{animation-delay:0.1s}
+body.wiggle-mode .app-icon:nth-child(4) .icon-bg{animation-delay:0.15s}
+body.wiggle-mode .app-icon:nth-child(5) .icon-bg{animation-delay:0.2s}
+body.wiggle-mode .app-icon:nth-child(6) .icon-bg{animation-delay:0.25s}
+body.wiggle-mode .app-icon:nth-child(7) .icon-bg{animation-delay:0.3s}
+body.wiggle-mode .app-icon:nth-child(8) .icon-bg{animation-delay:0.35s}
+
+body.wiggle-mode .app-icon.dragging .icon-bg{animation:none;transform:scale(1.1)}
+body.wiggle-mode .app-icon{cursor:grab}
+body.wiggle-mode .app-icon.dragging{opacity:0.4}
+
+/* Icon Backgrounds */
+.ic-weather{background:linear-gradient(135deg,#4A90E2 0%,#357ABD 100%)}
+.ic-music{background:linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%)}
+.ic-photos{background:linear-gradient(135deg,#FFD60A 0%,#FF9F0A 50%,#FF453A 100%)}
+.ic-notes{background:linear-gradient(135deg,#FFD60A 0%,#FFB800 100%)}
+.ic-calendar{background:#fff}
+.ic-calendar svg{color:#FF3B30}
+.ic-settings{background:linear-gradient(135deg,#8E8E93 0%,#48484A 100%)}
+.ic-clock{background:#000;border:1.5px solid rgba(255,255,255,0.2)}
+.ic-clock svg{color:#FFD60A}
+.ic-patient{background:linear-gradient(135deg,var(--sky-main) 0%,var(--sky-dark) 100%)}
+
+/* ===== PAGE INDICATOR ===== */
+#page-indicator{
+  position:absolute;bottom:94px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:20;
+}
+.page-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);transition:all 0.3s ease}
+.page-dot.active{background:#fff;width:18px;border-radius:3px}
+
+/* ===== DOCK ===== */
+#dock{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  width:340px;height:78px;background:var(--card-bg);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:32px;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:0 12px;z-index:30;
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+}
+#dock .app-icon .icon-label{display:none}
+#dock .app-icon .icon-bg{width:54px;height:54px}
+
+/* ===== HOME INDICATOR ===== */
+#home-indicator{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  width:134px;height:5px;background:rgba(255,255,255,0.5);
+  border-radius:3px;z-index:40;cursor:pointer;
+}
+
+/* ===== NOTIFICATION CENTER ===== */
+#notification-center{
+  position:absolute;inset:0;z-index:6000;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(30px) saturate(180%);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  transform:translateY(-100%);
+  transition:transform 0.5s var(--easing);
+  display:flex;flex-direction:column;
+  padding:60px 16px 30px;overflow-y:auto;
+}
+#notification-center.show{transform:translateY(0)}
+.nc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:0 16px}
+.nc-time{font-size:48px;font-weight:700;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+.nc-date{font-size:14px;color:rgba(255,255,255,0.7);margin-top:-4px}
+.nc-notif{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:18px;padding:14px;margin-bottom:10px;
+  display:flex;gap:12px;align-items:flex-start;
+  animation:slideIn 0.4s ease-out;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.nc-notif-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.nc-notif-content{flex:1;min-width:0}
+.nc-notif-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.nc-notif-app{font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.3px}
+.nc-notif-time{font-size:11px;color:rgba(255,255,255,0.5)}
+.nc-notif-title{font-size:14px;font-weight:600}
+.nc-notif-body{font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px;line-height:1.3}
+
+/* ===== CONTROL CENTER ===== */
+#control-center{
+  position:absolute;inset:0;z-index:6000;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(35px) saturate(180%);
+  -webkit-backdrop-filter:blur(35px) saturate(180%);
+  transform:translateY(100%);
+  transition:transform 0.5s var(--easing);
+  display:flex;flex-direction:column;padding:60px 16px 30px;
+}
+#control-center.show{transform:translateY(0)}
+.cc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.cc-card{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:20px;padding:14px;
+}
+.cc-card.col-span-2{grid-column:span 2}
+.cc-row{display:flex;align-items:center;gap:14px}
+.cc-toggle{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s;flex-shrink:0;
+}
+.cc-toggle.active{background:var(--green)}
+.cc-toggle svg{width:18px;height:18px;fill:#fff}
+
+/* ===== APP CONTAINER ===== */
+#app-container{
+  position:absolute;inset:0;z-index:7000;
+  display:none;overflow:hidden;background:#000;
+}
+#app-container.open{display:block}
+#app-container.closing{animation:appClose 0.4s var(--easing) forwards}
+@keyframes appClose{to{transform:scale(0.08);opacity:0;border-radius:80px}}
+
+.app-screen{
+  position:absolute;inset:0;
+  display:none;flex-direction:column;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:#000;
+}
+.app-screen.active{display:flex;animation:appOpen 0.4s var(--easing)}
+@keyframes appOpen{from{transform:scale(0.08);opacity:0;border-radius:80px}to{transform:scale(1);opacity:1;border-radius:0}}
+
+.app-header{
+  position:sticky;top:0;z-index:10;
+  padding:60px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:inherit;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.app-title{font-size:28px;font-weight:700;letter-spacing:-0.5px}
+.app-back-btn{
+  background:rgba(255,255,255,0.15);
+  border-radius:50%;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;transition:background 0.2s;
+}
+.app-back-btn:hover{background:rgba(255,255,255,0.25)}
+.app-back-btn svg{width:16px;height:16px;fill:#fff}
+.app-body{flex:1;padding:0 20px 40px}
+
+/* ===== WEATHER APP ===== */
+#weather-screen{background:linear-gradient(180deg,#1e3a5f 0%,#2C5F8A 60%,#4A90E2 100%)}
+.weather-hero{text-align:center;padding:20px 0 30px}
+.weather-loc-large{font-size:28px;font-weight:500}
+.weather-temp-large{font-size:88px;font-weight:200;line-height:1;letter-spacing:-3px;margin:4px 0}
+.weather-cond-large{font-size:18px;color:rgba(255,255,255,0.85)}
+.weather-hilo{font-size:16px;color:rgba(255,255,255,0.7);margin-top:6px}
+.hourly-forecast{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);
+  border-radius:18px;padding:16px;margin-bottom:14px;
+}
+.hourly-title{font-size:12px;color:rgba(255,255,255,0.6);font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px}
+.hourly-list{display:flex;gap:18px;overflow-x:auto;padding-bottom:4px}
+.hourly-item{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:50px}
+.hourly-time{font-size:13px;color:rgba(255,255,255,0.7);font-weight:500}
+.hourly-icon{font-size:22px}
+.hourly-temp{font-size:16px;font-weight:600}
+
+/* ===== MUSIC APP ===== */
+#music-screen{background:linear-gradient(180deg,#1a1a2e 0%,#2d1b4e 50%,#1a1a2e 100%)}
+.music-hero{text-align:center;padding:10px 0 24px}
+.music-art-large{
+  width:220px;height:220px;border-radius:18px;margin:0 auto 20px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  transition:transform 0.4s var(--easing);
+}
+.music-art-large.playing{animation:albumPulse 3s ease-in-out infinite}
+@keyframes albumPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.music-title-large{font-size:22px;font-weight:700}
+.music-artist-large{font-size:16px;color:rgba(255,255,255,0.6);margin-top:2px}
+.music-progress{margin:20px 0}
+.music-progress-bar{height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;cursor:pointer}
+.music-progress-fill{height:100%;background:#fff;border-radius:2px;width:0%;transition:width 0.1s linear}
+.music-progress-times{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;font-variant-numeric:tabular-nums}
+.music-controls{display:flex;justify-content:center;align-items:center;gap:30px;margin:24px 0}
+.music-controls button{transition:transform 0.15s}
+.music-controls button:active{transform:scale(0.85)}
+.play-btn{width:64px;height:64px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.play-btn svg{width:26px;height:26px;fill:#000;margin-left:2px}
+.skip-btn svg{width:28px;height:28px;fill:#fff}
+
+/* ===== PHOTOS APP ===== */
+#photos-screen{background:#000}
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.photos-grid img{width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:pointer;transition:transform 0.2s}
+.photos-grid img:active{transform:scale(0.95)}
+.photo-viewer{
+  position:absolute;inset:0;z-index:20;background:rgba(0,0,0,0.95);
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  padding:60px 20px 40px;
+}
+.photo-viewer.show{display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.photo-viewer img{max-width:100%;max-height:70vh;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,0.5)}
+.photo-close{position:absolute;top:60px;right:20px;background:rgba(255,255,255,0.15);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.photo-close svg{width:16px;height:16px;fill:#fff}
+
+/* ===== NOTES APP ===== */
+#notes-screen{background:#1c1c1e}
+.notes-list-item{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:14px;margin-bottom:8px;cursor:pointer;
+  transition:background 0.2s;
+}
+.notes-list-item:hover{background:rgba(255,255,255,0.1)}
+.notes-list-title{font-size:15px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notes-list-preview{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.notes-list-date{font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px}
+.note-editor{display:none;flex-direction:column;flex:1}
+.note-editor.show{display:flex}
+.note-editor-title{
+  background:transparent;border:none;outline:none;color:#fff;
+  font-size:22px;font-weight:700;padding:12px 0;
+}
+.note-editor-body{
+  background:transparent;border:none;outline:none;color:rgba(255,255,255,0.9);
+  font-size:16px;line-height:1.5;flex:1;resize:none;
+}
+.notes-empty{text-align:center;color:rgba(255,255,255,0.4);padding:60px 20px;font-size:14px}
+.fab{
+  position:absolute;bottom:30px;right:24px;width:56px;height:56px;border-radius:50%;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(10,132,255,0.4);z-index:5;
+}
+.fab svg{width:24px;height:24px;fill:#fff}
+
+/* ===== CALENDAR APP ===== */
+#calendar-screen{background:#000}
+.cal-month-header{font-size:24px;font-weight:700;text-align:center;margin-bottom:16px}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:8px}
+.cal-weekday{font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:15px;border-radius:50%;position:relative;cursor:pointer;
+  transition:background 0.2s;
+}
+.cal-day:hover{background:rgba(255,255,255,0.1)}
+.cal-day.other-month{color:rgba(255,255,255,0.25)}
+.cal-day.today{background:var(--accent);color:#fff;font-weight:700}
+.cal-day.has-event::after{
+  content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  width:5px;height:5px;border-radius:50%;background:var(--orange);
+}
+.cal-day.selected{background:rgba(10,132,255,0.3)}
+.cal-day.today.has-event::after{background:#fff}
+.cal-events{margin-top:24px}
+.cal-events-header{font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:12px}
+.cal-event{
+  background:rgba(255,255,255,0.06);border-left:3px solid var(--accent);
+  border-radius:0 12px 12px 0;padding:12px 14px;margin-bottom:8px;
+}
+.cal-event-time{font-size:12px;color:rgba(255,255,255,0.5);font-weight:600}
+.cal-event-title{font-size:15px;font-weight:600;margin-top:2px}
+.cal-event-desc{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px}
+
+/* ===== CLOCK APP ===== */
+#clock-screen{background:#000}
+.clock-display{text-align:center;padding:40px 0}
+.clock-current{font-size:72px;font-weight:200;letter-spacing:-2px}
+.clock-date-full{font-size:16px;color:rgba(255,255,255,0.6);margin-top:4px}
+.clock-list-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.clock-list-city{font-size:16px;font-weight:600}
+.clock-list-time{font-size:24px;font-weight:300;font-variant-numeric:tabular-nums}
+.clock-list-diff{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+
+/* ===== SETTINGS APP ===== */
+#settings-screen{background:#000}
+.settings-section{margin-bottom:24px}
+.settings-section-title{font-size:13px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:0 16px;margin-bottom:8px}
+.settings-group{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:14px;overflow:hidden;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.settings-item{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.settings-item:last-child{border:none}
+.settings-icon{
+  width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.settings-icon svg{width:16px;height:16px;fill:#fff}
+.settings-label{flex:1;font-size:15px}
+.settings-value{font-size:14px;color:rgba(255,255,255,0.5)}
+.toggle-switch{
+  width:48px;height:28px;border-radius:14px;background:rgba(255,255,255,0.15);
+  position:relative;cursor:pointer;transition:background 0.2s;
+}
+.toggle-switch.on{background:var(--green)}
+.toggle-knob{
+  position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+  background:#fff;transition:left 0.2s var(--easing);
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch.on .toggle-knob{left:22px}
+
+/* ===== TOAST ===== */
+#toast{
+  position:absolute;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(30,30,30,0.95);border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  color:#fff;padding:10px 20px;border-radius:18px;font-size:13px;font-weight:500;
+  z-index:8000;opacity:0;pointer-events:none;
+  transition:opacity 0.3s,transform 0.3s var(--easing);
+  white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+::-webkit-scrollbar{width:0;height:0;display:none}
+</style>
+</head>
+<body>
+
+<div id="frame-wrapper">
+  <div id="phone">
+    
+    <!-- Dynamic Island -->
+    <div id="dynamic-island">
+      <div id="dynamic-island-content">
+        <div id="island-album-art"></div>
+        <div id="island-track-info">
+          <div id="island-track-name">Not Playing</div>
+          <div id="island-artist-name">—</div>
+        </div>
+        <div id="island-wave" style="display:none">
+          <div class="island-bar"></div>
+          <div class="island-bar"></div>
+          <div class="island-bar"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Wallpaper -->
+    <div id="wallpaper"></div>
+    
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <div class="status-time" id="status-time">9:41</div>
+      <div class="status-icons">
+        <div id="signal-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M7.5 2.5C5.5 2.5 3.5 3.5 2 5L0.5 3.5C2.5 1.5 5 0.5 7.5 0.5C10 0.5 12.5 1.5 14.5 3.5L13 5C11.5 3.5 9.5 2.5 7.5 2.5Z" fill="white"/><path d="M7.5 6.5C6.5 6.5 5.5 7 5 7.5L3.5 6C4.5 5 6 4.5 7.5 4.5C9 4.5 10.5 5 11.5 6L10 7.5C9.5 7 8.5 6.5 7.5 6.5Z" fill="white"/><circle cx="7.5" cy="9.5" r="1.5" fill="white"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="22" height="12" rx="3" fill="none" stroke="white" stroke-opacity="0.5"/><rect x="2" y="2" width="19" height="9" rx="1.5" fill="white"/><path d="M24 4V9C25.5 8.5 25.5 4.5 24 4Z" fill="white" fill-opacity="0.5"/></svg>
+      </div>
+    </div>
+    
+    <!-- Home Screen -->
+    <div id="home-screen">
+      <div id="pages-container">
+        
+        <!-- Page 1 -->
+        <div class="page" data-page="0">
+          <div class="page-content">
+            
+            <!-- Clock + Weather Widget -->
+            <div class="widget clock-widget" id="clock-widget">
+              <div class="city">Cupertino</div>
+              <div class="time" id="widget-time">9:41</div>
+              <div class="weather-line">
+                <span id="widget-weather-icon">☀️</span>
+                <span id="widget-weather-temp">68°</span>
+                <span style="opacity:0.6">Sunny</span>
+              </div>
+            </div>
+            
+            <!-- Weather Widget -->
+            <div class="widget weather-widget" id="weather-widget">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="weather-loc">My Location</div>
+                  <div class="weather-temp" id="weather-temp">68°</div>
+                  <div class="weather-cond">Sunny</div>
+                  <div class="weather-range">H:74° <span class="low">L:58°</span></div>
+                </div>
+                <div style="font-size:40px">☀️</div>
+              </div>
+            </div>
+            
+            <!-- Patient Search Widget -->
+            <div class="widget patient-search-widget">
+              <div class="psw-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Pencarian Pasien HD
+              </div>
+              <div class="psw-body">
+                <input type="text" class="psw-search-input" id="widgetSearch" placeholder="Nama / MR / Ruang..." onkeyup="cariWidget()">
+                <input type="date" id="widgetDate" onchange="cariWidget()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px;color:#fff;font-size:12px;outline:none;width:140px">
+              </div>
+              <div class="psw-results" id="widgetResults">
+                <div class="psw-empty">Ketik minimal 2 karakter untuk mencari</div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- Page 2 -->
+        <div class="page" data-page="1">
+          <div class="page-content">
+            <div class="widget screentime-widget">
+              <div class="screentime-title">Screen Time</div>
+              <div class="screentime-val">2h 14m</div>
+              <div class="screentime-sub">↓ 12% from yesterday</div>
+            </div>
+            <div class="widget" style="padding:16px 18px">
+              <div class="screentime-title">Battery</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-size:28px;font-weight:600">84%</div>
+                <div style="font-size:32px">🔋</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- App Icons Grid -->
+      <div id="apps-grid-container" style="position:absolute;top:430px;left:0;right:0;padding:0 16px">
+        <div class="apps-grid" id="apps-grid">
+          <div class="app-icon" data-app="weather">
+            <div class="icon-bg ic-weather">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.8 1.79 1.41-1.41-1.79-1.8-1.42 1.42z"/></svg>
+            </div>
+            <div class="icon-label">Weather</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="music">
+            <div class="icon-bg ic-music">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <div class="icon-label">Music</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="photos">
+            <div class="icon-bg ic-photos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M3 7h2l1-2h12l1 2h2v12H3V7z" fill="currentColor" fill-opacity="0.3"/></svg>
+            </div>
+            <div class="icon-label">Photos</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="notes">
+            <div class="icon-bg ic-notes">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v14H3z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="2"/><line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <div class="icon-label">Notes</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="calendar">
+            <div class="icon-bg ic-calendar">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/><text x="12" y="17" font-size="9" text-anchor="middle" fill="currentColor" style="font-weight:bold">15</text></svg>
+            </div>
+            <div class="icon-label">Calendar</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="clock">
+            <div class="icon-bg ic-clock">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            </div>
+            <div class="icon-label">Clock</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="settings">
+            <div class="icon-bg ic-settings">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.21.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </div>
+            <div class="icon-label">Settings</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+          <div class="app-icon" data-app="patient">
+            <div class="icon-bg ic-patient">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div class="icon-label">Pasien HD</div>
+            <div class="delete-badge" onclick="event.stopPropagation();removeApp(this)">−</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Page Indicator -->
+      <div id="page-indicator">
+        <div class="page-dot active"></div>
+        <div class="page-dot"></div>
+      </div>
+      
+      <!-- Dock -->
+      <div id="dock">
+        <div class="app-icon" data-app="patient">
+          <div class="icon-bg ic-patient">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+        </div>
+        <div class="app-icon" data-app="notes">
+          <div class="icon-bg ic-notes">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v14H3z" fill="none" stroke="currentColor" stroke-width="2"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="2"/><line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+        </div>
+        <div class="app-icon" data-app="music">
+          <div class="icon-bg ic-music">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </div>
+        </div>
+        <div class="app-icon" data-app="settings">
+          <div class="icon-bg ic-settings">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.21.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Home Indicator -->
+      <div id="home-indicator"></div>
+      
+    </div>
+    
+    <!-- Notification Center -->
+    <div id="notification-center">
+      <div class="nc-header">
+        <div>
+          <div class="nc-time" id="nc-time">9:41</div>
+          <div class="nc-date" id="nc-date">Monday, June 15</div>
+        </div>
+      </div>
+      <div class="nc-notif">
+        <div class="nc-notif-icon" style="background:linear-gradient(135deg,#FFD60A,#FF9F0A)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        </div>
+        <div class="nc-notif-content">
+          <div class="nc-notif-header"><span class="nc-notif-app">Notes</span><span class="nc-notif-time">now</span></div>
+          <div class="nc-notif-title">Grocery List</div>
+          <div class="nc-notif-body">Don't forget to buy milk, eggs, and bread on your way home.</div>
+        </div>
+      </div>
+      <div class="nc-notif">
+        <div class="nc-notif-icon" style="background:linear-gradient(135deg,#03A9F4,#0288D1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div class="nc-notif-content">
+          <div class="nc-notif-header"><span class="nc-notif-app">HD Malahayati</span><span class="nc-notif-time">9:32 AM</span></div>
+          <div class="nc-notif-title">Jadwal HD Hari Ini</div>
+          <div class="nc-notif-body">Anda terdaftar untuk Shift 2 pukul 13:00 di Bed 3. Mohon datang 30 menit sebelum jadwal.</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Control Center -->
+    <div id="control-center">
+      <div class="cc-grid">
+        <div class="cc-card">
+          <div class="cc-row">
+            <div class="cc-toggle active" onclick="toggleCC(this)"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>
+            <div class="cc-toggle active" onclick="toggleCC(this)"><svg viewBox="0 0 24 24"><path d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z"/></svg></div>
+            <div class="cc-toggle" onclick="toggleCC(this)"><svg viewBox="0 0 24 24" style="fill:#FF9F0A"><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29z"/></svg></div>
+          </div>
+        </div>
+        <div class="cc-card">
+          <div class="cc-row">
+            <div class="cc-toggle active" onclick="toggleCC(this)"><svg viewBox="0 0 24 24"><path d="M2 22h20V2L2 22z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- App Container -->
+    <div id="app-container">
+      
+      <!-- Weather App -->
+      <div class="app-screen" id="weather-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div></div>
+        </div>
+        <div class="app-body">
+          <div class="weather-hero">
+            <div class="weather-loc-large">Cupertino</div>
+            <div class="weather-temp-large">68°</div>
+            <div class="weather-cond-large">Sunny</div>
+            <div class="weather-hilo">H:74° <span class="low">L:58°</span></div>
+          </div>
+          <div class="hourly-forecast">
+            <div class="hourly-title">Hourly Forecast</div>
+            <div class="hourly-list">
+              <div class="hourly-item"><div class="hourly-time">Now</div><div class="hourly-icon">☀️</div><div class="hourly-temp">68°</div></div>
+              <div class="hourly-item"><div class="hourly-time">10AM</div><div class="hourly-icon">☀️</div><div class="hourly-temp">70°</div></div>
+              <div class="hourly-item"><div class="hourly-time">11AM</div><div class="hourly-icon">☀️</div><div class="hourly-temp">72°</div></div>
+              <div class="hourly-item"><div class="hourly-time">12PM</div><div class="hourly-icon">⛅</div><div class="hourly-temp">73°</div></div>
+              <div class="hourly-item"><div class="hourly-time">1PM</div><div class="hourly-icon">⛅</div><div class="hourly-temp">74°</div></div>
+              <div class="hourly-item"><div class="hourly-time">2PM</div><div class="hourly-icon">⛅</div><div class="hourly-temp">74°</div></div>
+              <div class="hourly-item"><div class="hourly-time">3PM</div><div class="hourly-icon">⛅</div><div class="hourly-temp">73°</div></div>
+              <div class="hourly-item"><div class="hourly-time">4PM</div><div class="hourly-icon">🌤️</div><div class="hourly-temp">71°</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Music App -->
+      <div class="app-screen" id="music-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div></div>
+        </div>
+        <div class="app-body">
+          <div class="music-hero">
+            <div class="music-art-large playing" id="music-art-large" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)"></div>
+            <div class="music-title-large" id="music-title-large">Midnight City</div>
+            <div class="music-artist-large" id="music-artist-large">M83</div>
+            <div class="music-progress">
+              <div class="music-progress-bar" onclick="seekTrack(event,this)"><div class="music-progress-fill" id="music-progress-fill"></div></div>
+              <div class="music-progress-times"><span id="music-current-time">0:00</span><span id="music-total-time">3:56</span></div>
+            </div>
+            <div class="music-controls">
+              <button class="skip-btn" onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+              <button class="play-btn" id="play-btn" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="skip-btn" onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Photos App -->
+      <div class="app-screen" id="photos-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">Photos</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body" style="padding:0">
+          <div class="photos-grid" id="photos-grid"></div>
+        </div>
+        <div class="photo-viewer" id="photo-viewer">
+          <div class="photo-close" onclick="closePhoto()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+          <img id="photo-viewer-img" src="">
+        </div>
+      </div>
+      
+      <!-- Notes App -->
+      <div class="app-screen" id="notes-screen">
+        <div class="app-header">
+          <button class="app-back-btn" id="notes-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">Notes</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body" id="notes-list-view">
+          <div id="notes-list"></div>
+        </div>
+        <div class="note-editor" id="note-editor-view">
+          <input type="text" class="note-editor-title" id="note-title" placeholder="Title">
+          <textarea class="note-editor-body" id="note-body" placeholder="Note something..."></textarea>
+        </div>
+        <button class="fab" onclick="newNote()"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
+      </div>
+      
+      <!-- Calendar App -->
+      <div class="app-screen" id="calendar-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">Calendar</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body">
+          <div class="cal-month-header" id="cal-month-header">June 2024</div>
+          <div class="cal-weekdays">
+            <div class="cal-weekday">S</div><div class="cal-weekday">M</div><div class="cal-weekday">T</div>
+            <div class="cal-weekday">W</div><div class="cal-weekday">T</div><div class="cal-weekday">F</div><div class="cal-weekday">S</div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-events">
+            <div class="cal-events-header" id="cal-events-header">Today's Events</div>
+            <div id="cal-events-list"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Clock App -->
+      <div class="app-screen" id="clock-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">Clock</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body">
+          <div class="clock-display">
+            <div class="clock-current" id="clock-current">9:41:23</div>
+            <div class="clock-date-full" id="clock-date-full">Monday, June 15, 2024</div>
+          </div>
+          <div id="world-clocks"></div>
+        </div>
+      </div>
+      
+      <!-- Settings App -->
+      <div class="app-screen" id="settings-screen">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">Settings</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body">
+          <div class="settings-section">
+            <div class="settings-section-title">Connectivity</div>
+            <div class="settings-group">
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--orange)"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>
+                <div class="settings-label">Airplane Mode</div>
+                <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--accent)"><svg viewBox="0 0 24 24"><path d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z"/></svg></div>
+                <div class="settings-label">Wi-Fi</div>
+                <div class="toggle-switch on" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--accent)"><svg viewBox="0 0 24 24"><path d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 14.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29z"/></svg></div>
+                <div class="settings-label">Bluetooth</div>
+                <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Patient HD App (Full App) -->
+      <div class="app-screen" id="patient-screen" style="background:linear-gradient(180deg,#01579B 0%,#0288D1 30%,#03A9F4 100%);color:#fff">
+        <div class="app-header">
+          <button class="app-back-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+          <div style="font-size:17px;font-weight:600">HD Malahayati</div>
+          <div style="width:32px"></div>
+        </div>
+        <div class="app-body" style="max-width:500px;margin:0 auto">
+          
+          <div style="text-align:center;padding:20px;background:rgba(255,255,255,0.1);border-radius:18px;margin-bottom:16px;backdrop-filter:blur(10px)">
+            <div style="font-size:14px;font-weight:600;opacity:0.9">INSTALASI DIALISIS RSSA</div>
+            <div style="font-size:20px;font-weight:800;letter-spacing:1px;margin-top:4px">HD MALAHAYATI</div>
+            <div style="font-size:11px;margin-top:8px;opacity:0.8" id="app-clock">--:--:--</div>
+            <div style="font-size:10px;opacity:0.7" id="app-clock-date">--</div>
+          </div>
+          
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input type="text" id="search" placeholder="Cari Nama / MR / Ruang..." onkeyup="cari()" style="flex:1;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:12px 16px;color:#fff;font-size:13px;outline:none">
+            <input type="date" id="searchDate" onchange="cari()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:12px;color:#fff;font-size:12px;outline:none;width:140px">
+          </div>
+          
+          <div id="hasil" style="font-size:13px;font-weight:600;text-align:center;opacity:0.8;padding:10px">
+            Ketik minimal 2 karakter atau pilih tanggal untuk mencari
+          </div>
+          
+          <div id="patient-list" style="display:flex;flex-direction:column;gap:10px"></div>
+          
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Toast -->
+    <div id="toast"></div>
+    
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   STATE & DATA
+   ========================================================= */
+const state = {
+  currentPage: 0,
+  isWiggleMode: false,
+  openApp: null,
+  isNotifOpen: false,
+  isControlOpen: false,
+  musicPlaying: false,
+  currentTrack: 0,
+  musicProgress: 0,
+  musicInterval: null,
+  selectedCalDay: new Date().getDate(),
+  selectedPhoto: 0
+};
+
+const tracks = [
+  { title: 'Midnight City', artist: 'M83', duration: 236, gradient: 'linear-gradient(135deg,#8B5CF6,#EC4899)' },
+  { title: 'Blinding Lights', artist: 'The Weeknd', duration: 200, gradient: 'linear-gradient(135deg,#EF4444,#F59E0B)' },
+  { title: 'Levitating', artist: 'Dua Lipa', duration: 203, gradient: 'linear-gradient(135deg,#F59E0B,#EC4899)' }
+];
+
+// Data pasien HD lokal (dummy array sama persis format csv asli: index array)
+var dataPasien = [
+  ["123456","Budi Santoso","Ruang Mawar","Senin","17 Juni 2024","Bed 1","Tim A","1","06:30"],
+  ["234567","Siti Aminah","Ruang Melati","Senin","17 Juni 2024","Bed 2","Tim A","2","13:00"],
+  ["345678","Joko Widodo","Ruang Mawar","Selasa","18 Juni 2024","Bed 3","Tim B","1","06:30"],
+  ["456789","Dewi Lestari","Ruang Anggrek","Selasa","18 Juni 2024","Bed 1","Tim B","2","13:00"],
+  ["567890","Agus Salim","Ruang Melati","Rabu","19 Juni 2024","Bed 4","Tim A","1","06:30"],
+  ["678901","Rina Wati","Ruang Mawar","Rabu","19 Juni 2024","Bed 2","Tim A","2","13:00"],
+  ["789012","Bambang Sutrisno","Ruang Anggrek","Kamis","20 Juni 2024","Bed 1","Tim C","1","06:30"],
+  ["890123","Sri Wahyuni","Ruang Melati","Kamis","20 Juni 2024","Bed 3","Tim C","2","13:00"],
+  ["901234","Andi Gunawan","Ruang Mawar","Jumat","21 Juni 2024","Bed 4","Tim B","1","06:30"],
+  ["012345","Maya Putri","Ruang Anggrek","Jumat","21 Juni 2024","Bed 2","Tim B","2","13:00"]
+];
+
+/* =========================================================
+   CLOCK
+   ========================================================= */
+function updateClock(){
+  const now = new Date();
+  let h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const display = `${h}:${m}`;
+  
+  document.getElementById('status-time').textContent = display;
+  document.getElementById('widget-time').textContent = display;
+  document.getElementById('nc-time').textContent = display;
+  
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  document.getElementById('nc-date').textContent = dateStr;
+  
+  // Update patient app clock
+  const ac = document.getElementById('app-clock');
+  const acd = document.getElementById('app-clock-date');
+  if(ac){
+    ac.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+    const idDays = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const idMonths = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    acd.textContent = idDays[now.getDay()] + ', ' + now.getDate() + ' ' + idMonths[now.getMonth()] + ' ' + now.getFullYear();
+  }
+  
+  // Update Clock App if open
+  const cc = document.getElementById('clock-current');
+  if(cc){
+    cc.textContent = display + ':' + String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock-date-full').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* =========================================================
+   HOME SCREEN SWIPE
+   ========================================================= */
+const pagesContainer = document.getElementById('pages-container');
+const pageDots = document.querySelectorAll('.page-dot');
+const wallpaper = document.getElementById('wallpaper');
+
+function snapToPage(page){
+  state.currentPage = Math.max(0, Math.min(1, page));
+  pagesContainer.style.transform = `translateX(-${state.currentPage * 50}%)`;
+  pageDots.forEach((d,i) => d.classList.toggle('active', i === state.currentPage));
+  const offset = state.currentPage * 8;
+  wallpaper.style.backgroundPosition = `${offset}% 50%`;
+}
+
+let touchStartX = 0, touchStartY = 0, touchDeltaX = 0, isSwipe = false;
+
+pagesContainer.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchDeltaX = 0;
+  isSwipe = false;
+  pagesContainer.style.transition = 'none';
+}, { passive: true });
+
+pagesContainer.addEventListener('touchmove', e => {
+  touchDeltaX = e.touches[0].clientX - touchStartX;
+  const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+  if(!isSwipe && Math.abs(touchDeltaX) > deltaY && Math.abs(touchDeltaX) > 10){ isSwipe = true; }
+  if(isSwipe){
+    const move = touchDeltaX * 0.5;
+    pagesContainer.style.transform = `translateX(${-state.currentPage * 50 + move/10}%)`;
+  }
+}, { passive: true });
+
+pagesContainer.addEventListener('touchend', () => {
+  pagesContainer.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  if(isSwipe){
+    if(touchDeltaX < -50 && state.currentPage < 1) snapToPage(state.currentPage + 1);
+    else if(touchDeltaX > 50 && state.currentPage > 0) snapToPage(state.currentPage - 1);
+    else snapToPage(state.currentPage);
+  }
+  isSwipe = false;
+});
+
+// Mouse support
+let mouseDown = false;
+pagesContainer.addEventListener('mousedown', e => {
+  mouseDown = true;
+  touchStartX = e.clientX;
+  touchStartY = e.clientY;
+  touchDeltaX = 0;
+  isSwipe = false;
+  pagesContainer.style.transition = 'none';
+});
+document.addEventListener('mousemove', e => {
+  if(!mouseDown) return;
+  touchDeltaX = e.clientX - touchStartX;
+  const deltaY = Math.abs(e.clientY - touchStartY);
+  if(!isSwipe && Math.abs(touchDeltaX) > deltaY && Math.abs(touchDeltaX) > 10){ isSwipe = true; }
+  if(isSwipe){
+    const move = touchDeltaX * 0.5;
+    pagesContainer.style.transform = `translateX(${-state.currentPage * 50 + move/10}%)`;
+  }
+});
+document.addEventListener('mouseup', () => {
+  if(!mouseDown) return;
+  mouseDown = false;
+  pagesContainer.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  if(isSwipe){
+    if(touchDeltaX < -50 && state.currentPage < 1) snapToPage(state.currentPage + 1);
+    else if(touchDeltaX > 50 && state.currentPage > 0) snapToPage(state.currentPage - 1);
+    else snapToPage(state.currentPage);
+  }
+  isSwipe = false;
+});
+
+/* =========================================================
+   NOTIFICATION & CONTROL CENTER
+   ========================================================= */
+const notifCenter = document.getElementById('notification-center');
+const controlCenter = document.getElementById('control-center');
+const homeScreen = document.getElementById('home-screen');
+
+let pullStart = 0, pullType = null;
+
+homeScreen.addEventListener('touchstart', e => {
+  const y = e.touches[0].clientY;
+  if(y < 80){ pullType = 'down'; pullStart = y; }
+  else if(y > window.innerHeight - 80){ pullType = 'up'; pullStart = y; }
+}, { passive: true });
+
+homeScreen.addEventListener('touchmove', e => {
+  if(!pullType) return;
+  const y = e.touches[0].clientY;
+  const delta = y - pullStart;
+  if(pullType === 'down' && delta > 0){
+    notifCenter.style.transition = 'none';
+    notifCenter.style.transform = `translateY(${-100 + Math.min(delta / 300, 1) * 100}%)`;
+  } else if(pullType === 'up' && delta < 0){
+    controlCenter.style.transition = 'none';
+    controlCenter.style.transform = `translateY(${100 - Math.min(-delta / 300, 1) * 100}%)`;
+  }
+}, { passive: true });
+
+homeScreen.addEventListener('touchend', e => {
+  if(!pullType) return;
+  const y = e.changedTouches[0].clientY;
+  const delta = y - pullStart;
+  notifCenter.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  controlCenter.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  
+  if(pullType === 'down' && delta > 100){
+    notifCenter.classList.add('show');
+    state.isNotifOpen = true;
+  } else {
+    notifCenter.classList.remove('show');
+    state.isNotifOpen = false;
+  }
+  if(pullType === 'up' && delta < -100){
+    controlCenter.classList.add('show');
+    state.isControlOpen = true;
+  } else {
+    controlCenter.classList.remove('show');
+    state.isControlOpen = false;
+  }
+  notifCenter.style.transform = '';
+  controlCenter.style.transform = '';
+  pullType = null;
+});
+
+// Mouse support for pull down/up
+homeScreen.addEventListener('mousedown', e => {
+  const y = e.clientY;
+  if(y < 60){ pullType = 'down'; pullStart = y; }
+  else if(y > 780){ pullType = 'up'; pullStart = y; }
+});
+document.addEventListener('mousemove', e => {
+  if(!pullType) return;
+  const y = e.clientY;
+  const delta = y - pullStart;
+  if(pullType === 'down' && delta > 0){
+    notifCenter.style.transition = 'none';
+    notifCenter.style.transform = `translateY(${-100 + Math.min(delta / 300, 1) * 100}%)`;
+  } else if(pullType === 'up' && delta < 0){
+    controlCenter.style.transition = 'none';
+    controlCenter.style.transform = `translateY(${100 - Math.min(-delta / 300, 1) * 100}%)`;
+  }
+});
+document.addEventListener('mouseup', e => {
+  if(!pullType) return;
+  const y = e.clientY;
+  const delta = y - pullStart;
+  notifCenter.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  controlCenter.style.transition = 'transform 0.5s cubic-bezier(0.32,0.72,0,1)';
+  if(pullType === 'down' && delta > 100){
+    notifCenter.classList.add('show');
+    state.isNotifOpen = true;
+  } else {
+    notifCenter.classList.remove('show');
+    state.isNotifOpen = false;
+  }
+  if(pullType === 'up' && delta < -100){
+    controlCenter.classList.add('show');
+    state.isControlOpen = true;
+  } else {
+    controlCenter.classList.remove('show');
+    state.isControlOpen = false;
+  }
+  notifCenter.style.transform = '';
+  controlCenter.style.transform = '';
+  pullType = null;
+});
+
+notifCenter.addEventListener('click', e => {
+  if(e.target === notifCenter){ notifCenter.classList.remove('show'); state.isNotifOpen = false; }
+});
+controlCenter.addEventListener('click', e => {
+  if(e.target === controlCenter){ controlCenter.classList.remove('show'); state.isControlOpen = false; }
+});
+
+function toggleCC(el){ el.classList.toggle('active'); }
+function toggleSwitch(el){ el.classList.toggle('on'); }
+
+/* =========================================================
+   WIGGLE MODE
+   ========================================================= */
+let pressTimer = null;
+document.querySelectorAll('.app-icon').forEach(icon => {
+  icon.addEventListener('touchstart', () => {
+    pressTimer = setTimeout(() => {
+      state.isWiggleMode = true;
+      document.body.classList.add('wiggle-mode');
+    }, 600);
+  });
+  icon.addEventListener('touchend', () => clearTimeout(pressTimer));
+  icon.addEventListener('mousedown', () => {
+    pressTimer = setTimeout(() => {
+      state.isWiggleMode = true;
+      document.body.classList.add('wiggle-mode');
+    }, 600);
+  });
+  icon.addEventListener('mouseup', () => clearTimeout(pressTimer));
+});
+
+document.getElementById('home-screen').addEventListener('click', e => {
+  if(state.isWiggleMode && !e.target.closest('.app-icon')){
+    state.isWiggleMode = false;
+    document.body.classList.remove('wiggle-mode');
+  }
+});
+
+function removeApp(badge){
+  const icon = badge.closest('.app-icon');
+  icon.style.transition = 'transform 0.3s, opacity 0.3s';
+  icon.style.transform = 'scale(0)';
+  icon.style.opacity = '0';
+  setTimeout(() => { icon.remove(); showToast('App removed'); }, 300);
+}
+
+/* =========================================================
+   APP LAUNCH
+   ========================================================= */
+function openApp(appName){
+  if(state.isWiggleMode) return;
+  const icon = document.querySelector(`.app-icon[data-app="${appName}"]`);
+  if(!icon) return;
+  const appContainer = document.getElementById('app-container');
+  const screen = document.getElementById(`${appName}-screen`);
+  if(!screen) return;
+  
+  const iconRect = icon.getBoundingClientRect();
+  const phoneRect = document.getElementById('phone').getBoundingClientRect();
+  const iconCenterX = iconRect.left + iconRect.width/2 - phoneRect.left;
+  const iconCenterY = iconRect.top + iconRect.height/2 - phoneRect.top;
+  
+  appContainer.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
+  appContainer.classList.add('open');
+  appContainer.classList.remove('closing');
+  
+  document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+  setTimeout(() => screen.classList.add('active'), 10);
+  
+  state.openApp = appName;
+  
+  if(appName === 'weather') initWeather();
+  if(appName === 'music') initMusic();
+  if(appName === 'photos') initPhotos();
+  if(appName === 'notes') initNotes();
+  if(appName === 'calendar') initCalendar();
+  if(appName === 'clock') initClockApp();
+  if(appName === 'patient') initPatientApp();
+}
+
+function closeApp(){
+  const appContainer = document.getElementById('app-container');
+  const activeScreen = document.querySelector('.app-screen.active');
+  if(activeScreen) activeScreen.style.animation = 'appClose 0.4s cubic-bezier(0.32,0.72,0,1) forwards';
+  appContainer.classList.add('closing');
+  setTimeout(() => {
+    appContainer.classList.remove('open','closing');
+    if(activeScreen) activeScreen.classList.remove('active');
+    state.openApp = null;
+  }, 400);
+}
+
+document.querySelectorAll('.app-icon').forEach(icon => {
+  icon.addEventListener('click', e => {
+    if(state.isWiggleMode){ e.preventDefault(); return; }
+    openApp(icon.dataset.app);
+  });
+});
+
+document.getElementById('home-indicator').addEventListener('click', () => {
+  if(state.openApp) closeApp();
+  else if(state.isNotifOpen){ notifCenter.classList.remove('show'); state.isNotifOpen = false; }
+  else if(state.isControlOpen){ controlCenter.classList.remove('show'); state.isControlOpen = false; }
+});
+
+/* =========================================================
+   WEATHER APP
+   ========================================================= */
+function initWeather(){
+  const hourlyData = [
+    { time: 'Now', icon: '☀️', temp: '68°' }, { time: '10AM', icon: '☀️', temp: '70°' },
+    { time: '11AM', icon: '☀️', temp: '72°' }, { time: '12PM', icon: '⛅', temp: '73°' },
+    { time: '1PM', icon: '⛅', temp: '74°' }, { time: '2PM', icon: '⛅', temp: '74°' }
+  ];
+  // Already in HTML, but could be dynamic
+}
+
+/* =========================================================
+   MUSIC APP
+   ========================================================= */
+function initMusic(){
+  updateMusicDisplay();
+}
+
+function updateMusicDisplay(){
+  const track = tracks[state.currentTrack];
+  document.getElementById('music-art-large').style.background = track.gradient;
+  document.getElementById('music-title-large').textContent = track.title;
+  document.getElementById('music-artist-large').textContent = track.artist;
+  document.getElementById('music-total-time').textContent = `${Math.floor(track.duration/60)}:${String(track.duration%60).padStart(2,'0')}`;
+  document.getElementById('music-progress-fill').style.width = '0%';
+  document.getElementById('music-current-time').textContent = '0:00';
+  
+  document.getElementById('island-album-art').style.background = track.gradient;
+  document.getElementById('island-track-name').textContent = track.title;
+  document.getElementById('island-artist-name').textContent = track.artist;
+}
+
+function togglePlay(){
+  state.musicPlaying = !state.musicPlaying;
+  const playIcon = document.getElementById('play-icon');
+  if(state.musicPlaying){
+    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    document.querySelector('.music-art-large').classList.add('playing');
+    document.getElementById('island-wave').style.display = 'flex';
+    document.getElementById('dynamic-island').classList.add('expanded');
+    startMusicProgress();
+  } else {
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    document.querySelector('.music-art-large').classList.remove('playing');
+    document.getElementById('island-wave').style.display = 'none';
+    document.getElementById('dynamic-island').classList.remove('expanded');
+    stopMusicProgress();
+  }
+}
+
+function startMusicProgress(){
+  if(state.musicInterval) clearInterval(state.musicInterval);
+  state.musicProgress = 0;
+  const track = tracks[state.currentTrack];
+  state.musicInterval = setInterval(() => {
+    state.musicProgress += 0.5;
+    const percent = (state.musicProgress / track.duration) * 100;
+    document.getElementById('music-progress-fill').style.width = percent + '%';
+    const mins = Math.floor(state.musicProgress / 60);
+    const secs = Math.floor(state.musicProgress % 60);
+    document.getElementById('music-current-time').textContent = `${mins}:${String(secs).padStart(2,'0')}`;
+    if(state.musicProgress >= track.duration) nextTrack();
+  }, 500);
+}
+
+function stopMusicProgress(){
+  if(state.musicInterval){ clearInterval(state.musicInterval); state.musicInterval = null; }
+}
+
+function nextTrack(){
+  state.currentTrack = (state.currentTrack + 1) % tracks.length;
+  state.musicProgress = 0;
+  updateMusicDisplay();
+  if(state.musicPlaying){ stopMusicProgress(); startMusicProgress(); }
+}
+
+function prevTrack(){
+  state.currentTrack = (state.currentTrack - 1 + tracks.length) % tracks.length;
+  state.musicProgress = 0;
+  updateMusicDisplay();
+  if(state.musicPlaying){ stopMusicProgress(); startMusicProgress(); }
+}
+
+function seekTrack(e, el){
+  const rect = el.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width * 100;
+  const track = tracks[state.currentTrack];
+  state.musicProgress = (percent / 100) * track.duration;
+  document.getElementById('music-progress-fill').style.width = percent + '%';
+}
+
+/* =========================================================
+   PHOTOS APP
+   ========================================================= */
+const photos = [
+  { seed: 'mountain1', caption: 'Mountain Sunrise' },
+  { seed: 'beach2', caption: 'Tropical Beach' },
+  { seed: 'forest3', caption: 'Misty Forest' },
+  { seed: 'city4', caption: 'City at Night' },
+  { seed: 'desert5', caption: 'Desert Dunes' },
+  { seed: 'aurora6', caption: 'Northern Lights' },
+  { seed: 'flower7', caption: 'Spring Bloom' },
+  { seed: 'ocean8', caption: 'Deep Blue Sea' },
+  { seed: 'canyon9', caption: 'Grand Canyon' }
+];
+
+function initPhotos(){
+  const grid = document.getElementById('photos-grid');
+  grid.innerHTML = photos.map((p,i) => `
+    <img src="https://picsum.photos/seed/${p.seed}/300/300.jpg" alt="${p.caption}" onclick="viewPhoto(${i})" loading="lazy">
+  `).join('');
+}
+
+function viewPhoto(i){
+  state.selectedPhoto = i;
+  document.getElementById('photo-viewer-img').src = `https://picsum.photos/seed/${photos[i].seed}/800/800.jpg`;
+  document.getElementById('photo-viewer').classList.add('show');
+}
+
+function closePhoto(){
+  document.getElementById('photo-viewer').classList.remove('show');
+}
+
+/* =========================================================
+   NOTES APP
+   ========================================================= */
+const NOTES_KEY = 'mobile_os_notes';
+
+function getNotes(){
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_KEY)) || [
+      { id: 1, title: 'Welcome to Notes', body: 'This is your first note. Your notes are saved locally.', date: Date.now() - 86400000 },
+      { id: 2, title: 'Grocery List', body: '• Milk\n• Eggs\n• Bread', date: Date.now() - 43200000 }
+    ];
+  } catch(e) { return []; }
+}
+
+function saveNotes(notes){
+  localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+}
+
+function initNotes(){
+  showNotesList();
+  document.getElementById('notes-back-btn').onclick = () => {
+    if(document.getElementById('note-editor-view').classList.contains('show')) backToNotesList();
+    else closeApp();
+  };
+}
+
+function showNotesList(){
+  document.getElementById('notes-list-view').style.display = 'block';
+  document.getElementById('note-editor-view').classList.remove('show');
+  const notes = getNotes().sort((a,b) => b.date - a.date);
+  const list = document.getElementById('notes-list');
+  if(notes.length === 0){
+    list.innerHTML = '<div class="notes-empty">No notes yet</div>';
+    return;
+  }
+  list.innerHTML = notes.map(n => {
+    const date = new Date(n.date);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `
+      <div class="notes-list-item" onclick="openNote(${n.id})">
+        <div class="notes-list-title">${escapeHtml(n.title || 'Untitled')}</div>
+        <div class="notes-list-preview">${escapeHtml(n.body.substring(0, 100))}</div>
+        <div class="notes-list-date">${dateStr}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openNote(id){
+  const note = getNotes().find(n => n.id === id);
+  if(!note) return;
+  document.getElementById('notes-list-view').style.display = 'none';
+  document.getElementById('note-editor-view').classList.add('show');
+  document.getElementById('note-title').value = note.title || '';
+  document.getElementById('note-body').value = note.body || '';
+  state.selectedNoteId = id;
+}
+
+function newNote(){
+  state.selectedNoteId = null;
+  document.getElementById('notes-list-view').style.display = 'none';
+  document.getElementById('note-editor-view').classList.add('show');
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value = '';
+}
+
+function backToNotesList(){
+  const title = document.getElementById('note-title').value.trim();
+  const body = document.getElementById('note-body').value.trim();
+  if(title || body){
+    const notes = getNotes();
+    if(state.selectedNoteId){
+      const note = notes.find(n => n.id === state.selectedNoteId);
+      if(note){ note.title = title; note.body = body; note.date = Date.now(); }
+    } else {
+      notes.push({ id: Date.now(), title: title || 'Untitled', body, date: Date.now() });
+    }
+    saveNotes(notes);
+    showToast('Note saved');
+  }
+  showNotesList();
+}
+
+/* =========================================================
+   CALENDAR APP
+   ========================================================= */
+const calendarEvents = {
+  15: [{ time: '09:00', title: 'Team Standup', desc: 'Daily sync' }],
+  18: [{ time: '10:00', title: 'Coffee with Alex', desc: 'Downtown' }],
+  22: [{ time: '18:00', title: 'Concert Night', desc: 'M83 live' }]
+};
+
+function initCalendar(){
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-header').textContent = `${monthNames[month]} ${year}`;
+  
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  
+  let html = '';
+  for(let i = firstDay - 1; i >= 0; i--) html += `<div class="cal-day other-month">${daysInPrevMonth - i}</div>`;
+  for(let d = 1; d <= daysInMonth; d++){
+    const classes = ['cal-day'];
+    if(d === today) classes.push('today');
+    if(calendarEvents[d]) classes.push('has-event');
+    if(d === state.selectedCalDay) classes.push('selected');
+    html += `<div class="${classes.join(' ')}" onclick="selectCalDay(${d})">${d}</div>`;
+  }
+  const totalCells = firstDay + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for(let d = 1; d <= remaining; d++) html += `<div class="cal-day other-month">${d}</div>`;
+  
+  document.getElementById('cal-grid').innerHTML = html;
+  renderCalEvents();
+}
+
+function selectCalDay(day){
+  state.selectedCalDay = day;
+  document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+  event.target.classList.add('selected');
+  renderCalEvents();
+}
+
+function renderCalEvents(){
+  const events = calendarEvents[state.selectedCalDay] || [];
+  const now = new Date();
+  const isToday = state.selectedCalDay === now.getDate();
+  document.getElementById('cal-events-header').textContent = isToday ? "Today's Events" : `Events on ${state.selectedCalDay}`;
+  
+  if(events.length === 0){
+    document.getElementById('cal-events-list').innerHTML = '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:30px;font-size:14px">No events scheduled</div>';
+    return;
+  }
+  document.getElementById('cal-events-list').innerHTML = events.map(e => `
+    <div class="cal-event">
+      <div class="cal-event-time">${e.time}</div>
+      <div class="cal-event-title">${escapeHtml(e.title)}</div>
+      <div class="cal-event-desc">${escapeHtml(e.desc)}</div>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   CLOCK APP
+   ========================================================= */
+function initClockApp(){
+  const worldClocks = [
+    { city: 'Cupertino', offset: -7 },
+    { city: 'London', offset: 0 },
+    { city: 'Tokyo', offset: 9 }
+  ];
+  document.getElementById('world-clocks').innerHTML = worldClocks.map(w => {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const cityTime = new Date(utc + 3600000 * w.offset);
+    const h = cityTime.getHours();
+    const m = String(cityTime.getMinutes()).padStart(2,'0');
+    const diff = w.offset - (-now.getTimezoneOffset()/60);
+    const diffStr = diff >= 0 ? `+${diff}HRS` : `${diff}HRS`;
+    return `
+      <div class="clock-list-item">
+        <div>
+          <div class="clock-list-city">${w.city}</div>
+          <div class="clock-list-diff">${diffStr}, Today</div>
+        </div>
+        <div class="clock-list-time">${h}:${m}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =========================================================
+   PATIENT HD APP
+   ========================================================= */
+function initPatientApp(){
+  cari();
+}
+
+function parseTanggal(t) {
+  if (!t) return null;
+  var bulanMap = { 'januari':0,'februari':1,'maret':2,'april':3,'mei':4,'juni':5,'juli':6,'agustus':7,'september':8,'oktober':9,'november':10,'desember':11 };
+  var parts = String(t).toLowerCase().split(" ");
+  if (parts.length < 3) return null;
+  var bln = bulanMap[parts[1]];
+  if (bln === undefined) return null;
+  var tgl = parseInt(parts[0]); if (isNaN(tgl)) return null;
+  var thn = parseInt(parts[2]); if (isNaN(thn)) return null;
+  return new Date(thn, bln, tgl);
+}
+
+function getTarget(tanggal, shift) {
+  var d = parseTanggal(tanggal);
+  if (!d) return new Date();
+  if (shift == "1") d.setHours(6, 30, 0, 0);
+  else d.setHours(13, 0, 0, 0);
+  return d;
+}
+
+function cari() {
+  var keyword = document.getElementById('search').value.toLowerCase();
+  var dateInput = document.getElementById('searchDate').value;
+  
+  if (keyword.length < 2 && !dateInput) {
+    document.getElementById('hasil').innerHTML = "Ketik minimal 2 karakter atau pilih tanggal untuk mencari";
+    document.getElementById('patient-list').innerHTML = '';
+    return;
+  }
+  
+  var out = "";
+  var found = 0;
+  
+  dataPasien.forEach(function(r) {
+    var textMatch = true;
+    if (keyword.length >= 2) textMatch = r.join(" ").toLowerCase().includes(keyword);
+    
+    var dateMatch = true;
+    if (dateInput) {
+      var rowDate = parseTanggal(r[4]);
+      if (rowDate) {
+        var dd = rowDate.getDate(), mm = rowDate.getMonth() + 1, yy = rowDate.getFullYear();
+        var formatted = yy + '-' + (mm < 10 ? '0' : '') + mm + '-' + (dd < 10 ? '0' : '') + dd;
+        dateMatch = (formatted === dateInput);
+      } else {
+        dateMatch = false;
+      }
+    }
+    
+    if (!textMatch || !dateMatch) return;
+    found++;
+    
+    var target = getTarget(r[4], r[7]);
+    var selesai = new Date() > target;
+    var sisa = target - new Date();
+    
+    var countdownHtml = '';
+    if (!selesai && sisa > 0) {
+      var jam = Math.floor(sisa / 3600000);
+      var menit = Math.floor((sisa % 3600000) / 60000);
+      countdownHtml = jam > 0 ? 
+        `<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:8px">Mulai dalam ${jam} jam ${menit} menit</div>` :
+        `<div style="display:inline-block;margin-top:6px;font-size:11px;font-weight:700;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:8px">Mulai dalam ${menit} menit</div>`;
+    }
+    
+    out += `
+      <div style="background:rgba(255,255,255,0.95);color:#1b1b1b;border-radius:18px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2);${selesai ? 'opacity:0.7;' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="font-size:17px;font-weight:700;color:#01579B">${r[1]}</div>
+          <div style="font-size:11px;color:#78909c;text-align:right">MR<br><b>XX${String(r[0]).slice(-4)}</b></div>
+        </div>
+        <div style="font-size:13px;line-height:1.7;margin-top:8px">
+          Ruang: ${r[2]}<br>
+          Hari: ${r[3]}<br>
+          Tanggal: ${r[4]}<br>
+          Bed: ${r[5]}<br>
+          Tim: ${r[6]}<br>
+          <span style="display:inline-block;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,#03A9F4,#FF8F00);color:#fff;font-size:11px;font-weight:700;margin-top:4px">Shift ${r[7]}</span>
+          ${countdownHtml}<br>
+          Jam: ${r[8]}
+        </div>
+      </div>
+    `;
+  });
+  
+  if (!out) {
+    document.getElementById('hasil').innerHTML = "Data tidak ditemukan";
+    document.getElementById('patient-list').innerHTML = '';
+  } else {
+    document.getElementById('hasil').innerHTML = `${found} pasien ditemukan`;
+    document.getElementById('patient-list').innerHTML = out;
+  }
+}
+
+// Widget Search (Live on Home Screen)
+function cariWidget() {
+  var keyword = document.getElementById('widgetSearch').value.toLowerCase();
+  var dateInput = document.getElementById('widgetDate').value;
+  var resultsEl = document.getElementById('widgetResults');
+  
+  if (keyword.length < 2 && !dateInput) {
+    resultsEl.innerHTML = '<div class="psw-empty">Ketik minimal 2 karakter untuk mencari</div>';
+    return;
+  }
+  
+  var found = [];
+  
+  dataPasien.forEach(function(r) {
+    var textMatch = true;
+    if (keyword.length >= 2) textMatch = r.join(" ").toLowerCase().includes(keyword);
+    
+    var dateMatch = true;
+    if (dateInput) {
+      var rowDate = parseTanggal(r[4]);
+      if (rowDate) {
+        var dd = rowDate.getDate(), mm = rowDate.getMonth() + 1, yy = rowDate.getFullYear();
+        var formatted = yy + '-' + (mm < 10 ? '0' : '') + mm + '-' + (dd < 10 ? '0' : '') + dd;
+        dateMatch = (formatted === dateInput);
+      } else {
+        dateMatch = false;
+      }
+    }
+    
+    if (textMatch && dateMatch) found.push(r);
+  });
+  
+  if (found.length === 0) {
+    resultsEl.innerHTML = '<div class="psw-empty">Tidak ada data ditemukan</div>';
+  } else {
+    resultsEl.innerHTML = found.map(r => `
+      <div class="psw-result-item" onclick="openApp('patient')">
+        <div>
+          <div class="psw-result-name">${r[1]}</div>
+          <div class="psw-result-meta">MR: XX${String(r[0]).slice(-4)} • ${r[2]} • Shift ${r[7]}</div>
+        </div>
+        <div style="color:var(--sky-main);font-size:18px">›</div>
+      </div>
+    `).join('');
+  }
+}
+
+/* =========================================================
+   WIDGET REFRESH
+   ========================================================= */
+function refreshWidgets(){
+  document.querySelectorAll('.widget').forEach(w => {
+    w.classList.remove('pulse');
+    void w.offsetWidth;
+    w.classList.add('pulse');
+  });
+  const temps = [68, 70, 72, 65, 75];
+  const icons = ['☀️','⛅','🌤️','🌦️'];
+  const temp = temps[Math.floor(Math.random()*temps.length)];
+  const icon = icons[Math.floor(Math.random()*icons.length)];
+  document.getElementById('widget-weather-temp').textContent = `${temp}°`;
+  document.getElementById('widget-weather-icon').textContent = icon;
+  document.getElementById('weather-temp').textContent = `${temp}°`;
+}
+setInterval(refreshWidgets, 8000);
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    if(state.openApp) closeApp();
+    else if(state.isNotifOpen){ notifCenter.classList.remove('show'); state.isNotifOpen = false; }
+    else if(state.isControlOpen){ controlCenter.classList.remove('show'); state.isControlOpen = false; }
+    else if(state.isWiggleMode){ state.isWiggleMode = false; document.body.classList.remove('wiggle-mode'); }
+  }
+  if(e.key === 'ArrowLeft' && !state.openApp && state.currentPage > 0) snapToPage(state.currentPage - 1);
+  if(e.key === 'ArrowRight' && !state.openApp && state.currentPage < 1) snapToPage(state.currentPage + 1);
+});
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+</script>
+</body>
+</html>
